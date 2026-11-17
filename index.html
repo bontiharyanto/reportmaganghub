@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08356f">
+  <meta name="description" content="Asisten draf laporan harian MagangHub BRIN untuk disalin manual.">
+  <meta name="apple-mobile-web-app-title" content="Laporan Magang">
+  <title>Laporan Harian MagangHub BRIN</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap head-wrap">
+      <h1>Bintang Respati Aryananda, S.T.</h1>
+      <p class="org">MagangHub BRIN · Teknik Metalurgi</p>
+      <p class="today" id="tanggal-hari-ini">Memuat tanggal...</p>
+    </div>
+  </header>
+
+  <div id="banner-ingat" class="banner" role="status" hidden>
+    Jangan lupa isi laporan di monev.maganghub.kemnaker.go.id sebelum 23.59 WIB
+  </div>
+
+  <noscript>
+    <p class="banner">Aktifkan JavaScript untuk menyusun draf laporan. Aplikasi ini berjalan di browser dan tidak mengirim data ke server.</p>
+  </noscript>
+
+  <main class="wrap">
+    <nav class="nav" aria-label="Halaman">
+      <button type="button" id="nav-laporan" aria-current="page">Buat Laporan</button>
+      <button type="button" id="nav-riwayat">Riwayat <span id="badge-riwayat" class="badge">0</span></button>
+    </nav>
+
+    <section id="view-laporan">
+      <form id="form-laporan" class="card stack">
+        <h2>Input singkat</h2>
+        <p class="hint">Tulis tiga poin apa adanya. Draf formal disusun di bawah, lalu bisa diubah sebelum disalin.</p>
+
+        <div class="field">
+          <label for="input-tanggal">Tanggal laporan</label>
+          <input id="input-tanggal" name="tanggal" type="date" required>
+        </div>
+
+        <div class="field">
+          <label for="input-poin">Apa yang dikerjakan hari ini?</label>
+          <textarea id="input-poin" name="poin" rows="5" maxlength="2000" placeholder="1. Menyiapkan sampel sesuai prosedur lab&#10;2. Mencatat urutan kerja&#10;3. Berdiskusi dengan mentor tentang langkah yang belum jelas"></textarea>
+          <p class="hint">Satu poin tiap baris. Jangan menulis ketidakhadiran.</p>
+        </div>
+
+        <div class="field">
+          <label for="input-kegiatan">Lokasi / Kegiatan</label>
+          <select id="input-kegiatan" name="kegiatan">
+            <option value="Lab">Lab</option>
+            <option value="Observasi">Observasi</option>
+            <option value="Bimbingan Mentor">Bimbingan Mentor</option>
+            <option value="Olah Data">Olah Data</option>
+            <option value="Studi Literatur">Studi Literatur</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-generate">GENERATE LAPORAN</button>
+      </form>
+
+      <section id="hasil" class="stack" hidden>
+        <h2 tabindex="-1">Hasil draf</h2>
+        <p id="peringatan-poin" class="note warn" role="status" hidden></p>
+
+        <article class="card result-card">
+          <div class="result-head">
+            <h3>Uraian Aktivitas</h3>
+            <button type="button" class="btn btn-small btn-ghost" id="btn-copy-uraian">Salin</button>
+          </div>
+          <textarea id="out-uraian" rows="7" maxlength="8000" aria-describedby="count-uraian" spellcheck="true"></textarea>
+          <p id="count-uraian" class="counter bad" aria-live="polite">0 / 100 karakter - Belum memenuhi syarat minimal 100 karakter</p>
+        </article>
+
+        <article class="card result-card">
+          <div class="result-head">
+            <h3>Pelajaran yang Diperoleh</h3>
+            <button type="button" class="btn btn-small btn-ghost" id="btn-copy-pelajaran">Salin</button>
+          </div>
+          <textarea id="out-pelajaran" rows="7" maxlength="8000" aria-describedby="count-pelajaran" spellcheck="true"></textarea>
+          <p id="count-pelajaran" class="counter bad" aria-live="polite">0 / 100 karakter - Belum memenuhi syarat minimal 100 karakter</p>
+        </article>
+
+        <article class="card result-card">
+          <div class="result-head">
+            <h3>Kendala yang Dialami</h3>
+            <button type="button" class="btn btn-small btn-ghost" id="btn-copy-kendala">Salin</button>
+          </div>
+          <textarea id="out-kendala" rows="7" maxlength="8000" aria-describedby="count-kendala" spellcheck="true"></textarea>
+          <p id="count-kendala" class="counter bad" aria-live="polite">0 / 100 karakter - Belum memenuhi syarat minimal 100 karakter</p>
+        </article>
+
+        <p class="note">Periksa ketiga draf sebelum disalin. Ubah kalimat yang kurang sesuai dengan kegiatan hari ini.</p>
+
+        <div class="stack">
+          <button type="button" class="btn btn-ghost" id="btn-copy-semua">Salin Semua</button>
+          <button type="button" class="btn btn-primary" id="btn-simpan">Simpan ke Riwayat</button>
+          <button type="button" class="btn btn-soft" id="btn-export">Unduh Semua (.txt)</button>
+        </div>
+      </section>
+    </section>
+
+    <section id="view-riwayat" hidden>
+      <div class="section-head">
+        <h2 tabindex="-1">Riwayat laporan</h2>
+        <button type="button" class="btn btn-small btn-ghost" id="btn-export-riwayat">Unduh .txt</button>
+      </div>
+      <p id="riwayat-kosong" class="note">Belum ada laporan tersimpan. Susun draf, lalu simpan ke riwayat.</p>
+      <div id="daftar-riwayat" class="stack"></div>
+    </section>
+
+    <footer class="footer">
+      <p>Aplikasi ini hanya menyusun draf tulisan di browser. Laporan disalin manual. Tidak ada login otomatis dan tidak ada data yang dikirim ke server.</p>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
