@@ -11,6 +11,49 @@
     org: "MagangHub BRIN"
   };
 
+  var MOCK_SAMPLES = [
+    {
+      date: "2026-11-15",
+      kegiatan: "Lab",
+      poin: "Menyiapkan area kerja dan alat keselamatan\nMengamati preparasi sampel logam sesuai SOP\nBerdiskusi urutan kerja dengan mentor",
+      uraian: "Pada hari ini saya melaksanakan kegiatan di laboratorium sebagai bagian dari magang riset metalurgi di BRIN. Tiga pokok yang saya kerjakan hari ini adalah menyiapkan area kerja dan alat keselamatan, mengamati preparasi sampel logam sesuai SOP, dan berdiskusi urutan kerja dengan mentor. Selama kegiatan saya mengikuti SOP yang berlaku, memakai perlengkapan keselamatan yang diperlukan, dan menjaga kebersihan meja kerja. Menjelang akhir sesi saya memeriksa kembali catatan, menyampaikan ringkasan pekerjaan kepada mentor, dan meninggalkan area kerja dalam keadaan tertib.",
+      pelajaran: "Dari kegiatan laboratorium hari ini saya memahami bahwa ketelitian preparasi dan kedisiplinan mengikuti prosedur sangat memengaruhi mutu pengamatan pada riset metalurgi. Cara sampel ditangani menentukan apakah informasi yang nanti dibaca dari material masih dapat dipercaya. Catatan kegiatan yang paling saya kaitkan dengan pelajaran ini: menyiapkan area kerja dan alat keselamatan.",
+      kendala: "Kendala yang saya alami adalah adaptasi terhadap urutan penggunaan peralatan yang masih relatif baru bagi saya. Pada awalnya saya ragu membedakan langkah persiapan dan langkah kerja inti. Saya mengatasinya dengan bertanya kepada mentor, mencatat urutannya, lalu mengulangi langkah tersebut secara lebih perlahan.",
+      savedAt: "2026-11-15T14:30:00.000Z"
+    },
+    {
+      date: "2026-11-16",
+      kegiatan: "Studi Literatur",
+      poin: "Membaca bab tentang korosi baja karbon\nMencatat istilah fasa dan struktur mikro\nBertanya kaitannya dengan kegiatan di lab",
+      uraian: "Pada hari ini saya melakukan studi literatur untuk memperdalam konsep yang berkaitan dengan kegiatan riset metalurgi. Tiga pokok yang saya kerjakan hari ini adalah membaca bab tentang korosi baja karbon, mencatat istilah fasa dan struktur mikro, dan bertanya kaitannya dengan kegiatan di lab. Saya membaca secara bertahap, menandai istilah yang belum paham, lalu mendiskusikannya dengan mentor agar artinya tidak saya tebak. Di akhir sesi saya merangkum butir yang sudah saya pahami, menyimpan catatan istilah, dan mengonfirmasi ringkasan kepada mentor.",
+      pelajaran: "Dari studi literatur hari ini saya memahami bahwa bacaan ilmiah membantu saya melihat alasan di balik prosedur pada riset metalurgi. Tanpa konteks itu, langkah di laboratorium mudah dihafal tetapi sulit dijelaskan. Catatan kegiatan yang paling saya kaitkan dengan pelajaran ini: membaca bab tentang korosi baja karbon.",
+      kendala: "Kendala yang saya alami adalah beberapa bagian bacaan memakai istilah yang masih baru bagi saya. Saya tidak memaksakan tafsiran sendiri. Saya menandai istilah itu, bertanya kepada mentor, dan menuliskan penjelasannya dalam catatan.",
+      savedAt: "2026-11-16T14:30:00.000Z"
+    },
+    {
+      date: "2026-11-17",
+      kegiatan: "Bimbingan Mentor",
+      poin: "Menyampaikan perkembangan catatan magang\nMembahas cara membaca grafik hasil uji umum\nMenyusun rencana kegiatan minggu depan",
+      uraian: "Pada hari ini saya mengikuti bimbingan mentor untuk memperdalam pemahaman kegiatan riset metalurgi di BRIN. Tiga pokok yang saya kerjakan hari ini adalah menyampaikan perkembangan catatan magang, membahas cara membaca grafik hasil uji umum, dan menyusun rencana kegiatan minggu depan. Mentor menjelaskan kaitan antara prosedur kerja dan konsep metalurgi yang mendasarinya, lalu saya mencatatnya secara berurutan. Di akhir bimbingan saya merangkum arahan, meminta konfirmasi, dan menetapkan catatan yang akan saya bawa ke kegiatan berikutnya.",
+      pelajaran: "Dari bimbingan hari ini saya memahami bahwa riset metalurgi membutuhkan alur pikir yang tertib, mulai dari tujuan, prosedur, hingga cara membaca temuan secara hati-hati. Arahan mentor membantu saya melihat hubungan itu secara utuh. Catatan kegiatan yang paling saya kaitkan dengan pelajaran ini: menyampaikan perkembangan catatan magang.",
+      kendala: "Kendala yang saya alami adalah beberapa konsep yang dibahas masih terasa abstrak bagi saya. Saya belum langsung mampu menghubungkannya dengan pekerjaan harian. Saya meminta mentor memberi contoh yang lebih dekat dengan kegiatan saya, lalu saya tulis ulang dengan bahasa sendiri.",
+      savedAt: "2026-11-17T14:30:00.000Z"
+    }
+  ];
+
+  function mergeMockSamples(current) {
+    var byDate = {};
+    (current || []).forEach(function (item) {
+      byDate[item.date] = item;
+    });
+    MOCK_SAMPLES.forEach(function (item) {
+      if (!byDate[item.date]) byDate[item.date] = item;
+    });
+    return Object.keys(byDate).sort().map(function (date) {
+      return byDate[date];
+    });
+  }
+
   var KEGIATAN = {
     Lab: {
       fallback: [
@@ -501,6 +544,7 @@
     var badge = document.getElementById("badge-riwayat");
     var daftar = document.getElementById("daftar-riwayat");
     var kosong = document.getElementById("riwayat-kosong");
+    var btnMuatContoh = document.getElementById("btn-muat-contoh");
     var toastEl = document.getElementById("toast");
     var toastTimer = 0;
     var previousSeed = -1;
@@ -529,6 +573,24 @@
 
     function persist(items) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function loadMockSamples(silent) {
+      var next = mergeMockSamples(loadAll());
+      if (next.length === loadAll().length && loadAll().length >= MOCK_SAMPLES.length) {
+        if (!silent) toast("Contoh untuk tanggal ini sudah ada di riwayat.");
+        return false;
+      }
+      try {
+        persist(next);
+      } catch (err) {
+        toast("Gagal memuat contoh. Ruang penyimpanan browser penuh.");
+        return false;
+      }
+      updateBadge();
+      if (!viewRiwayat.hidden) renderHistory();
+      if (!silent) toast("Contoh riwayat (3 hari) dimuat.");
+      return true;
     }
 
     function refreshCounters() {
@@ -570,6 +632,7 @@
       });
       daftar.replaceChildren();
       kosong.hidden = items.length > 0;
+      if (btnMuatContoh) btnMuatContoh.hidden = items.length > 0;
       items.forEach(function (item) {
         var card = document.createElement("article");
         card.className = "card history-card";
@@ -773,11 +836,13 @@
     document.getElementById("btn-export-riwayat").addEventListener("click", exportAll);
     navLaporan.addEventListener("click", function () { showView("laporan"); });
     navRiwayat.addEventListener("click", function () { showView("riwayat"); });
+    if (btnMuatContoh) btnMuatContoh.addEventListener("click", function () { loadMockSamples(false); });
 
     inputTanggal.value = todayISO(new Date());
     refreshCounters();
     refreshClock();
-    updateBadge();
+    if (loadAll().length === 0) loadMockSamples(true);
+    else updateBadge();
     window.setInterval(refreshClock, 60000);
   }
 
@@ -790,7 +855,9 @@
     jakartaHour: jakartaHour,
     todayISO: todayISO,
     buildExportText: buildExportText,
-    textCopyAll: textCopyAll
+    textCopyAll: textCopyAll,
+    mergeMockSamples: mergeMockSamples,
+    MOCK_SAMPLES: MOCK_SAMPLES
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
